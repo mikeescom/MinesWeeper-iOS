@@ -6,13 +6,16 @@
 //
 
 import UIKit
+import GoogleSignIn
+import FirebaseCore
+import FirebaseAuth
 
 class LogInViewController: UIViewController {
 
-    
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var logInButton: UIButton!
+    @IBOutlet weak var signInButton: GIDSignInButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,7 +39,43 @@ class LogInViewController: UIViewController {
     }
 
     @IBAction func logInPressed(_ sender: UIButton) {
+        self.performSegue(withIdentifier: "goToCreateAccount", sender: self)
     }
+    
+    @IBAction func googleSignInPressed(_ sender: GIDSignInButton) {
+        //googleSignIn()
+        self.performSegue(withIdentifier: "goToBoard", sender: self)
+    }
+    
+    func googleSignIn() {
+        print("googleSignIn")
+        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
+
+        // Create Google Sign In configuration object.
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+
+        // Start the sign in flow!
+        GIDSignIn.sharedInstance.signIn(withPresenting: self) { [unowned self] result, error in
+            if let user = result?.user,let idToken = user.idToken?.tokenString {
+                if error != nil {
+                    print("Error: \(String(describing: error))")
+                    return
+                }
+                let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: user.accessToken.tokenString)
+
+                Auth.auth().signIn(with: credential) { result, error in
+                    if error != nil {
+                        print("Error: \(String(describing: error))")
+                        return
+                    } else {
+                        self.performSegue(withIdentifier: "goToBoard", sender: self)
+                    }
+                }
+            }
+        }
+    }
+    
 }
 
 extension UIView {
