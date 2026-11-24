@@ -97,8 +97,8 @@ final class GameBoardViewController: UIViewController {
         userButton.contentVerticalAlignment = .fill
         userButton.showsMenuAsPrimaryAction = true
         userButton.menu = UIMenu(children: [
-            UIAction(title: "Number of Mines", image: UIImage(systemName: "gearshape")) { [weak self] _ in
-                self?.showEditNumberOfMines()
+            UIAction(title: "Settings", image: UIImage(systemName: "gearshape")) { [weak self] _ in
+                self?.showSettings()
             },
             UIAction(title: "Records", image: UIImage(systemName: "trophy")) { [weak self] _ in
                 guard let self else { return }
@@ -242,30 +242,20 @@ final class GameBoardViewController: UIViewController {
         }
     }
 
-    private func showEditNumberOfMines() {
-        let maxMines = Board.maxMines(width: fittedWidth, height: fittedHeight)
-        let alert = UIAlertController(title: "Edit number of mines",
-                                      message: "Between 1 and \(maxMines)",
-                                      preferredStyle: .alert)
-        let currentMines = container.settings.numberOfMines
-        alert.addTextField { field in
-            field.keyboardType = .numberPad
-            field.text = "\(currentMines)"
+    private func showSettings() {
+        let settings = SettingsViewController(
+            container: container,
+            maxMines: Board.maxMines(width: fittedWidth, height: fittedHeight),
+            onNumberOfMinesChanged: { [weak self] in self?.numberOfMinesChanged() },
+            onLogOut: { [weak self] in self?.logOut() })
+        navigationController?.pushViewController(settings, animated: true)
+    }
+
+    /// A changed mine count drops the game in progress so a fresh one starts, as on Android.
+    private func numberOfMinesChanged() {
+        if board?.mineCount != container.settings.numberOfMines {
+            startNewGame()
         }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Update", style: .default) { [weak self, weak alert] _ in
-            guard let self else { return }
-            let text = alert?.textFields?.first?.text ?? ""
-            if text.isEmpty {
-                self.showAlert(title: "Field is missing", message: "Number of mines must be entered")
-            } else if let value = Int(text), (1...maxMines).contains(value) {
-                self.container.settings.numberOfMines = value
-                self.startNewGame()
-            } else {
-                self.showAlert(title: "Error", message: "Number of mines must be between 1 and \(maxMines)")
-            }
-        })
-        present(alert, animated: true)
     }
 
     private func logOut() {

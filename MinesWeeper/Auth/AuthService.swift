@@ -16,6 +16,7 @@ protocol AuthProviding: AnyObject {
     /// The signed-in player's Firebase uid, or nil when signed out.
     var currentUserId: String? { get }
     var currentUserPhotoURL: URL? { get }
+    var currentUserEmail: String? { get }
 
     func signIn(email: String, password: String, completion: @escaping (Error?) -> Void)
     func createAccount(email: String, password: String, completion: @escaping (Error?) -> Void)
@@ -43,6 +44,7 @@ final class FirebaseAuthService: AuthProviding {
 
     var currentUserId: String? { auth.currentUser?.uid }
     var currentUserPhotoURL: URL? { auth.currentUser?.photoURL }
+    var currentUserEmail: String? { auth.currentUser?.email }
 
     func signIn(email: String, password: String, completion: @escaping (Error?) -> Void) {
         auth.signIn(withEmail: email, password: password) { _, error in completion(error) }

@@ -44,15 +44,7 @@ final class RecordsViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard let navigationBar = navigationController?.navigationBar else { return }
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = Theme.surface1
-        appearance.titleTextAttributes = [.foregroundColor: Theme.primaryText]
-        navigationBar.standardAppearance = appearance
-        navigationBar.scrollEdgeAppearance = appearance
-        navigationBar.tintColor = Theme.primaryText
-        navigationController?.setNavigationBarHidden(false, animated: animated)
+        navigationController?.showThemedNavigationBar(animated: animated)
     }
 
     @objc private func reload() {
