@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct RecordItem: Equatable {
+struct RecordItem: Equatable, Codable {
     var numberOfMines: Int
     var fieldSize: Int
     var timeInSeconds: Int

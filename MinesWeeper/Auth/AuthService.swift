@@ -66,7 +66,7 @@ enum AuthService {
         }
     }
 
-    /// Signs out of Firebase and Google and forgets this player's preferences.
+    /// Signs out of Firebase and Google and forgets this player's preferences and local records.
     static func signOut() {
         do {
             try Auth.auth().signOut()
@@ -75,5 +75,6 @@ enum AuthService {
         }
         GIDSignIn.sharedInstance.signOut()
         Settings.clear()
+        RecordsRepository.shared.clearLocalRecords()
     }
 }

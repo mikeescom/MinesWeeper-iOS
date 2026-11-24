@@ -43,6 +43,9 @@ final class GameBoardViewController: UIViewController {
         setUpHeader()
         setUpBoard()
         loadUserPhoto()
+        if let userId = AuthService.currentUser?.uid {
+            RecordsRepository.shared.startSync(userId: userId)
+        }
     }
 
     override func viewDidLayoutSubviews() {
