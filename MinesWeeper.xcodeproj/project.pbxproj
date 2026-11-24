@@ -10,10 +10,22 @@
 		E43B2F332CB5C55A00EC0485 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E43B2F322CB5C55A00EC0485 /* FirebaseAuth */; };
 		E43B2F362CB5C59D00EC0485 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E43B2F352CB5C59D00EC0485 /* GoogleSignIn */; };
 		E43B2F382CB5C59D00EC0485 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E43B2F372CB5C59D00EC0485 /* GoogleSignInSwift */; };
+		E43B2F402CB5A74100EC0485 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = E43B2F412CB5A74100EC0485 /* FirebaseDatabase */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E43B2F482CB5A74100EC0485 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E43B2F0D2CB5A74100EC0485 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E43B2F142CB5A74100EC0485;
+			remoteInfo = MinesWeeper;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		E43B2F152CB5A74100EC0485 /* MinesWeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MinesWeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E43B2F422CB5A74100EC0485 /* MinesWeeperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinesWeeperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -35,6 +47,11 @@
 			path = MinesWeeper;
 			sourceTree = "<group>";
 		};
+		E43B2F432CB5A74100EC0485 /* MinesWeeperTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MinesWeeperTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +62,14 @@
 				E43B2F382CB5C59D00EC0485 /* GoogleSignInSwift in Frameworks */,
 				E43B2F332CB5C55A00EC0485 /* FirebaseAuth in Frameworks */,
 				E43B2F362CB5C59D00EC0485 /* GoogleSignIn in Frameworks */,
+				E43B2F402CB5A74100EC0485 /* FirebaseDatabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E43B2F462CB5A74100EC0485 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				E43B2F172CB5A74100EC0485 /* MinesWeeper */,
+				E43B2F432CB5A74100EC0485 /* MinesWeeperTests */,
 				E43B2F162CB5A74100EC0485 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				E43B2F152CB5A74100EC0485 /* MinesWeeper.app */,
+				E43B2F422CB5A74100EC0485 /* MinesWeeperTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -90,10 +117,34 @@
 				E43B2F322CB5C55A00EC0485 /* FirebaseAuth */,
 				E43B2F352CB5C59D00EC0485 /* GoogleSignIn */,
 				E43B2F372CB5C59D00EC0485 /* GoogleSignInSwift */,
+				E43B2F412CB5A74100EC0485 /* FirebaseDatabase */,
 			);
 			productName = MinesWeeper;
 			productReference = E43B2F152CB5A74100EC0485 /* MinesWeeper.app */;
 			productType = "com.apple.product-type.application";
+		};
+		E43B2F442CB5A74100EC0485 /* MinesWeeperTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E43B2F4C2CB5A74100EC0485 /* Build configuration list for PBXNativeTarget "MinesWeeperTests" */;
+			buildPhases = (
+				E43B2F452CB5A74100EC0485 /* Sources */,
+				E43B2F462CB5A74100EC0485 /* Frameworks */,
+				E43B2F472CB5A74100EC0485 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E43B2F492CB5A74100EC0485 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E43B2F432CB5A74100EC0485 /* MinesWeeperTests */,
+			);
+			name = MinesWeeperTests;
+			packageProductDependencies = (
+			);
+			productName = MinesWeeperTests;
+			productReference = E43B2F422CB5A74100EC0485 /* MinesWeeperTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -107,6 +158,10 @@
 				TargetAttributes = {
 					E43B2F142CB5A74100EC0485 = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					E43B2F442CB5A74100EC0485 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = E43B2F142CB5A74100EC0485;
 					};
 				};
 			};
@@ -129,12 +184,20 @@
 			projectRoot = "";
 			targets = (
 				E43B2F142CB5A74100EC0485 /* MinesWeeper */,
+				E43B2F442CB5A74100EC0485 /* MinesWeeperTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E43B2F132CB5A74100EC0485 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E43B2F472CB5A74100EC0485 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -151,7 +214,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E43B2F452CB5A74100EC0485 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E43B2F492CB5A74100EC0485 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E43B2F142CB5A74100EC0485 /* MinesWeeper */;
+			targetProxy = E43B2F482CB5A74100EC0485 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E43B2F292CB5A74200EC0485 /* Debug */ = {
@@ -166,9 +244,8 @@
 				INFOPLIST_FILE = MinesWeeper/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -198,9 +275,8 @@
 				INFOPLIST_FILE = MinesWeeper/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -270,7 +346,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -327,13 +403,51 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E43B2F4A2CB5A74100EC0485 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q7398BA2WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.msmikeescom.MinesWeeperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MinesWeeper.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MinesWeeper";
+			};
+			name = Debug;
+		};
+		E43B2F4B2CB5A74100EC0485 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q7398BA2WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.msmikeescom.MinesWeeperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MinesWeeper.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MinesWeeper";
 			};
 			name = Release;
 		};
@@ -354,6 +468,15 @@
 			buildConfigurations = (
 				E43B2F292CB5A74200EC0485 /* Debug */,
 				E43B2F2A2CB5A74200EC0485 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E43B2F4C2CB5A74100EC0485 /* Build configuration list for PBXNativeTarget "MinesWeeperTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E43B2F4A2CB5A74100EC0485 /* Debug */,
+				E43B2F4B2CB5A74100EC0485 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -394,6 +517,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E43B2F342CB5C59D00EC0485 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		E43B2F412CB5A74100EC0485 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E43B2F312CB5C55A00EC0485 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
