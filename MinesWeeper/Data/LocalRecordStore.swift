@@ -10,9 +10,11 @@ import Foundation
 
 final class LocalRecordStore {
 
-    static let shared = LocalRecordStore(fileURL: LocalRecordStore.defaultFileURL)
+    /// Posted on the main queue whenever records are added or deleted.
+    static let didChangeNotification = Notification.Name("LocalRecordStore.didChange")
 
-    private static var defaultFileURL: URL {
+    /// records.json in Application Support.
+    static var defaultFileURL: URL {
         let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return directory.appendingPathComponent("records.json")
     }
@@ -44,6 +46,7 @@ final class LocalRecordStore {
             guard records[id] == nil else { return false }
             records[id] = record
             save(records)
+            postChange()
             return true
         }
     }
@@ -52,10 +55,17 @@ final class LocalRecordStore {
         queue.sync {
             cache = [:]
             try? FileManager.default.removeItem(at: fileURL)
+            postChange()
         }
     }
 
     // MARK: - Must be called on `queue`
+
+    private func postChange() {
+        DispatchQueue.main.async { [self] in
+            NotificationCenter.default.post(name: Self.didChangeNotification, object: self)
+        }
+    }
 
     private func load() -> [String: RecordItem] {
         if let cache { return cache }

@@ -6,12 +6,19 @@
 import Foundation
 import FirebaseDatabase
 
+protocol RecordsStoring: AnyObject {
+    func startSync(userId: String)
+    func stopSync()
+    func addRecord(_ record: RecordItem, userId: String)
+    /// The records stored on this device, newest first.
+    func loadAllRecords() -> [RecordItem]
+    func clearLocalRecords()
+}
+
 /// Saves finished games to the Realtime Database under the signed-in user's Firebase uid and
 /// keeps the on-device copy in step, like MainRepository plus the child listener on Android.
 /// Offline persistence (enabled in AppDelegate) queues writes made without a connection.
-final class RecordsRepository {
-
-    static let shared = RecordsRepository(localStore: .shared)
+final class RecordsRepository: RecordsStoring {
 
     private static let usersTable = "users"
 

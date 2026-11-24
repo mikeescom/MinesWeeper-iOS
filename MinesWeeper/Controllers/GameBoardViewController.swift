@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import FirebaseAuth
 
 final class GameBoardViewController: UIViewController {
 
@@ -24,6 +23,17 @@ final class GameBoardViewController: UIViewController {
     private let boardContainer = UIView()
     private let boardView = BoardView()
 
+    private let container: AppContainer
+
+    init(container: AppContainer) {
+        self.container = container
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) is not supported")
+    }
+
     private var board: Board?
     /// Board dimensions that fit the available space, measured after layout.
     private var fittedWidth = 0
@@ -39,12 +49,11 @@ final class GameBoardViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Theme.surface1
-        navigationController?.setNavigationBarHidden(true, animated: false)
         setUpHeader()
         setUpBoard()
         loadUserPhoto()
-        if let userId = AuthService.currentUser?.uid {
-            RecordsRepository.shared.startSync(userId: userId)
+        if let userId = container.auth.currentUserId {
+            container.records.startSync(userId: userId)
         }
     }
 
@@ -70,6 +79,7 @@ final class GameBoardViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
         if isTimerRunning { startTicker() }
     }
 
@@ -87,8 +97,13 @@ final class GameBoardViewController: UIViewController {
         userButton.contentVerticalAlignment = .fill
         userButton.showsMenuAsPrimaryAction = true
         userButton.menu = UIMenu(children: [
-            UIAction(title: "Number of Mines", image: UIImage(systemName: "gearshape")) { [weak self] _ in
-                self?.showEditNumberOfMines()
+            UIAction(title: "Settings", image: UIImage(systemName: "gearshape")) { [weak self] _ in
+                self?.showSettings()
+            },
+            UIAction(title: "Records", image: UIImage(systemName: "trophy")) { [weak self] _ in
+                guard let self else { return }
+                self.navigationController?.pushViewController(RecordsViewController(records: self.container.records),
+                                                              animated: true)
             },
             UIAction(title: "Log Out", image: UIImage(systemName: "rectangle.portrait.and.arrow.right"),
                      attributes: .destructive) { [weak self] _ in
@@ -137,7 +152,7 @@ final class GameBoardViewController: UIViewController {
     }
 
     private func loadUserPhoto() {
-        guard let url = AuthService.currentUser?.photoURL else { return }
+        guard let url = container.auth.currentUserPhotoURL else { return }
         URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
             guard let data, let image = UIImage(data: data) else { return }
             DispatchQueue.main.async {
@@ -154,9 +169,9 @@ final class GameBoardViewController: UIViewController {
     private func startNewGame() {
         guard fittedWidth > 0, fittedHeight > 0 else { return }
         let maxMines = Board.maxMines(width: fittedWidth, height: fittedHeight)
-        let numberOfMines = min(Settings.numberOfMines, maxMines)
-        Settings.numberOfMines = numberOfMines
-        Settings.fieldSize = fittedWidth * fittedHeight
+        let numberOfMines = min(container.settings.numberOfMines, maxMines)
+        container.settings.numberOfMines = numberOfMines
+        container.settings.fieldSize = fittedWidth * fittedHeight
         guard let newBoard = Board(width: fittedWidth, height: fittedHeight, mineCount: numberOfMines) else { return }
         board = newBoard
         resetTimer()
@@ -207,13 +222,13 @@ final class GameBoardViewController: UIViewController {
         startTimer()
         stopTimer()
 
-        if let userId = AuthService.currentUser?.uid {
+        if let userId = container.auth.currentUserId {
             let record = RecordItem(
                 numberOfMines: board.mineCount,
                 fieldSize: board.width * board.height,
                 timeInSeconds: elapsedSeconds(),
                 timeStamp: Int64(Date().timeIntervalSince1970 * 1000))
-            RecordsRepository.shared.addRecord(record, userId: userId)
+            container.records.addRecord(record, userId: userId)
         }
 
         showAlert(title: "You Won!", message: "You have won!. Do you want to start a new game?") { [weak self] in
@@ -227,35 +242,26 @@ final class GameBoardViewController: UIViewController {
         }
     }
 
-    private func showEditNumberOfMines() {
-        let maxMines = Board.maxMines(width: fittedWidth, height: fittedHeight)
-        let alert = UIAlertController(title: "Edit number of mines",
-                                      message: "Between 1 and \(maxMines)",
-                                      preferredStyle: .alert)
-        alert.addTextField { field in
-            field.keyboardType = .numberPad
-            field.text = "\(Settings.numberOfMines)"
+    private func showSettings() {
+        let settings = SettingsViewController(
+            container: container,
+            maxMines: Board.maxMines(width: fittedWidth, height: fittedHeight),
+            onNumberOfMinesChanged: { [weak self] in self?.numberOfMinesChanged() },
+            onLogOut: { [weak self] in self?.logOut() })
+        navigationController?.pushViewController(settings, animated: true)
+    }
+
+    /// A changed mine count drops the game in progress so a fresh one starts, as on Android.
+    private func numberOfMinesChanged() {
+        if board?.mineCount != container.settings.numberOfMines {
+            startNewGame()
         }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Update", style: .default) { [weak self, weak alert] _ in
-            guard let self else { return }
-            let text = alert?.textFields?.first?.text ?? ""
-            if text.isEmpty {
-                self.showAlert(title: "Field is missing", message: "Number of mines must be entered")
-            } else if let value = Int(text), (1...maxMines).contains(value) {
-                Settings.numberOfMines = value
-                self.startNewGame()
-            } else {
-                self.showAlert(title: "Error", message: "Number of mines must be between 1 and \(maxMines)")
-            }
-        })
-        present(alert, animated: true)
     }
 
     private func logOut() {
         ticker?.invalidate()
-        AuthService.signOut()
-        switchRoot(to: LogInViewController())
+        container.logOut()
+        switchRoot(to: LogInViewController(container: container))
     }
 
     // MARK: - Timer

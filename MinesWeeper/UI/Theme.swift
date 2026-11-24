@@ -51,6 +51,20 @@ enum Theme {
     }
 }
 
+extension UINavigationController {
+    /// Shows the navigation bar in the app's colors, for pushed screens like Records and Settings.
+    func showThemedNavigationBar(animated: Bool) {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = Theme.surface1
+        appearance.titleTextAttributes = [.foregroundColor: Theme.primaryText]
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.tintColor = Theme.primaryText
+        setNavigationBarHidden(false, animated: animated)
+    }
+}
+
 extension UIColor {
     convenience init(hex: UInt32) {
         self.init(red: CGFloat((hex >> 16) & 0xFF) / 255,
@@ -64,7 +78,9 @@ extension UIViewController {
 
     /// Replaces the window's root so the previous flow (login or game) can't be navigated back to.
     func switchRoot(to viewController: UIViewController) {
-        guard let window = view.window else { return }
+        // A screen pushed on top (like Settings) leaves this view out of the window, so fall back
+        // to the navigation controller's.
+        guard let window = view.window ?? navigationController?.view.window else { return }
         window.rootViewController = UINavigationController(rootViewController: viewController)
         UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: nil)
     }
