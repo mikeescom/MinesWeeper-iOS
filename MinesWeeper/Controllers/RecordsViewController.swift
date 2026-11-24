@@ -13,7 +13,10 @@ final class RecordsViewController: UITableViewController {
     private var records: [RecordItem] = []
     private let emptyLabel = UILabel()
 
-    init() {
+    private let recordsStore: RecordsStoring
+
+    init(records: RecordsStoring) {
+        recordsStore = records
         super.init(style: .plain)
     }
 
@@ -53,7 +56,7 @@ final class RecordsViewController: UITableViewController {
     }
 
     @objc private func reload() {
-        records = RecordRanking.rank(RecordsRepository.shared.loadAllRecords())
+        records = RecordRanking.rank(recordsStore.loadAllRecords())
         tableView.backgroundView = records.isEmpty ? emptyLabel : nil
         tableView.reloadData()
     }

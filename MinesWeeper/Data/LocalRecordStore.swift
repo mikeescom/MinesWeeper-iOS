@@ -13,9 +13,8 @@ final class LocalRecordStore {
     /// Posted on the main queue whenever records are added or deleted.
     static let didChangeNotification = Notification.Name("LocalRecordStore.didChange")
 
-    static let shared = LocalRecordStore(fileURL: LocalRecordStore.defaultFileURL)
-
-    private static var defaultFileURL: URL {
+    /// records.json in Application Support.
+    static var defaultFileURL: URL {
         let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return directory.appendingPathComponent("records.json")
     }

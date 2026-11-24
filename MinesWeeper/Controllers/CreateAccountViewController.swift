@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import FirebaseAuth
 
 final class CreateAccountViewController: UIViewController {
 
@@ -16,6 +15,17 @@ final class CreateAccountViewController: UIViewController {
     private let createButton = Theme.button(title: "Create account")
     private let backButton = Theme.button(title: "Return to log in", filled: false)
     private let spinner = UIActivityIndicatorView(style: .large)
+
+    private let container: AppContainer
+
+    init(container: AppContainer) {
+        self.container = container
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) is not supported")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,14 +71,14 @@ final class CreateAccountViewController: UIViewController {
         }
         spinner.startAnimating()
         view.isUserInteractionEnabled = false
-        AuthService.createAccount(email: email, password: password) { [weak self] error in
+        container.auth.createAccount(email: email, password: password) { [weak self] error in
             guard let self else { return }
             self.spinner.stopAnimating()
             self.view.isUserInteractionEnabled = true
             if let error {
                 self.showAlert(title: "Error", message: Self.message(for: error))
             } else {
-                self.switchRoot(to: GameBoardViewController())
+                self.switchRoot(to: GameBoardViewController(container: self.container))
             }
         }
     }

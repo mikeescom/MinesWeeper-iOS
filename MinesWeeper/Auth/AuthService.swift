@@ -3,7 +3,8 @@
 //  MinesWeeper
 //
 //  Every player, Google or email, is signed in to Firebase Auth; the Firebase uid keys their
-//  records, as on Android.
+//  records, as on Android. Screens depend on the AuthProviding protocol, so tests and previews
+//  can pass a fake.
 //
 
 import UIKit
@@ -11,7 +12,20 @@ import FirebaseCore
 import FirebaseAuth
 import GoogleSignIn
 
-enum AuthService {
+protocol AuthProviding: AnyObject {
+    /// The signed-in player's Firebase uid, or nil when signed out.
+    var currentUserId: String? { get }
+    var currentUserPhotoURL: URL? { get }
+
+    func signIn(email: String, password: String, completion: @escaping (Error?) -> Void)
+    func createAccount(email: String, password: String, completion: @escaping (Error?) -> Void)
+    func sendPasswordReset(email: String, completion: @escaping (Error?) -> Void)
+    /// Completes with nil on success, and is never called if the player cancels.
+    func signInWithGoogle(presenting viewController: UIViewController, completion: @escaping (Error?) -> Void)
+    func signOut()
+}
+
+final class FirebaseAuthService: AuthProviding {
 
     enum AuthServiceError: LocalizedError {
         case missingClientID
@@ -25,30 +39,31 @@ enum AuthService {
         }
     }
 
-    static var currentUser: User? { Auth.auth().currentUser }
+    private var auth: Auth { Auth.auth() }
 
-    static func signIn(email: String, password: String, completion: @escaping (Error?) -> Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { _, error in completion(error) }
+    var currentUserId: String? { auth.currentUser?.uid }
+    var currentUserPhotoURL: URL? { auth.currentUser?.photoURL }
+
+    func signIn(email: String, password: String, completion: @escaping (Error?) -> Void) {
+        auth.signIn(withEmail: email, password: password) { _, error in completion(error) }
     }
 
-    static func createAccount(email: String, password: String, completion: @escaping (Error?) -> Void) {
-        Auth.auth().createUser(withEmail: email, password: password) { _, error in completion(error) }
+    func createAccount(email: String, password: String, completion: @escaping (Error?) -> Void) {
+        auth.createUser(withEmail: email, password: password) { _, error in completion(error) }
     }
 
-    static func sendPasswordReset(email: String, completion: @escaping (Error?) -> Void) {
-        Auth.auth().sendPasswordReset(withEmail: email) { error in completion(error) }
+    func sendPasswordReset(email: String, completion: @escaping (Error?) -> Void) {
+        auth.sendPasswordReset(withEmail: email) { error in completion(error) }
     }
 
-    /// Shows Google's sign-in flow and signs the chosen account in to Firebase.
-    /// Completes with nil on success, and with no call at all if the player cancels.
-    static func signInWithGoogle(presenting viewController: UIViewController,
-                                 completion: @escaping (Error?) -> Void) {
+    func signInWithGoogle(presenting viewController: UIViewController,
+                          completion: @escaping (Error?) -> Void) {
         guard let clientID = FirebaseApp.app()?.options.clientID else {
             completion(AuthServiceError.missingClientID)
             return
         }
         GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
-        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { result, error in
+        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { [auth] result, error in
             if let error {
                 if let signInError = error as? GIDSignInError, signInError.code == .canceled {
                     return
@@ -62,19 +77,16 @@ enum AuthService {
             }
             let credential = GoogleAuthProvider.credential(withIDToken: idToken,
                                                            accessToken: user.accessToken.tokenString)
-            Auth.auth().signIn(with: credential) { _, error in completion(error) }
+            auth.signIn(with: credential) { _, error in completion(error) }
         }
     }
 
-    /// Signs out of Firebase and Google and forgets this player's preferences and local records.
-    static func signOut() {
+    func signOut() {
         do {
-            try Auth.auth().signOut()
+            try auth.signOut()
         } catch {
-            print("AuthService: Firebase sign-out failed: \(error)")
+            print("FirebaseAuthService: Firebase sign-out failed: \(error)")
         }
         GIDSignIn.sharedInstance.signOut()
-        Settings.clear()
-        RecordsRepository.shared.clearLocalRecords()
     }
 }

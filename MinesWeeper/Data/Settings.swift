@@ -7,30 +7,41 @@
 
 import Foundation
 
-enum Settings {
+protocol GameSettings: AnyObject {
+    /// The saved mine count, or the default when nothing valid was saved.
+    var numberOfMines: Int { get set }
+    var fieldSize: Int { get set }
+    func clear()
+}
+
+final class UserDefaultsSettings: GameSettings {
     static let defaultNumberOfMines = 15
 
     private static let numberOfMinesKey = "KEY_NUM_OF_MINES"
     private static let fieldSizeKey = "KEY_FIELD_SIZE"
 
-    private static var defaults: UserDefaults { .standard }
+    private let defaults: UserDefaults
 
-    /// The saved mine count, or the default when nothing valid was saved.
-    static var numberOfMines: Int {
+    /// [defaults] is injectable so tests can use a throwaway suite.
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    var numberOfMines: Int {
         get {
-            let saved = defaults.integer(forKey: numberOfMinesKey)
-            return saved > 0 ? saved : defaultNumberOfMines
+            let saved = defaults.integer(forKey: Self.numberOfMinesKey)
+            return saved > 0 ? saved : Self.defaultNumberOfMines
         }
-        set { defaults.set(newValue, forKey: numberOfMinesKey) }
+        set { defaults.set(newValue, forKey: Self.numberOfMinesKey) }
     }
 
-    static var fieldSize: Int {
-        get { defaults.integer(forKey: fieldSizeKey) }
-        set { defaults.set(newValue, forKey: fieldSizeKey) }
+    var fieldSize: Int {
+        get { defaults.integer(forKey: Self.fieldSizeKey) }
+        set { defaults.set(newValue, forKey: Self.fieldSizeKey) }
     }
 
-    static func clear() {
-        defaults.removeObject(forKey: numberOfMinesKey)
-        defaults.removeObject(forKey: fieldSizeKey)
+    func clear() {
+        defaults.removeObject(forKey: Self.numberOfMinesKey)
+        defaults.removeObject(forKey: Self.fieldSizeKey)
     }
 }

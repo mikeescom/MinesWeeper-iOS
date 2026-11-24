@@ -19,6 +19,17 @@ final class LogInViewController: UIViewController {
     private let createAccountButton = Theme.button(title: "Create account", filled: false)
     private let spinner = UIActivityIndicatorView(style: .large)
 
+    private let container: AppContainer
+
+    init(container: AppContainer) {
+        self.container = container
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) is not supported")
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Theme.surface1
@@ -103,12 +114,12 @@ final class LogInViewController: UIViewController {
     }
 
     private func goToGame() {
-        switchRoot(to: GameBoardViewController())
+        switchRoot(to: GameBoardViewController(container: container))
     }
 
     @objc private func googleTapped() {
         // No spinner here: Google shows its own sheet, and a cancelled sign-in never calls back.
-        AuthService.signInWithGoogle(presenting: self) { [weak self] error in
+        container.auth.signInWithGoogle(presenting: self) { [weak self] error in
             guard let self else { return }
             if let error {
                 print("LogInViewController: Google sign-in failed: \(error)")
@@ -127,7 +138,7 @@ final class LogInViewController: UIViewController {
             return
         }
         setBusy(true)
-        AuthService.signIn(email: email, password: password) { [weak self] error in
+        container.auth.signIn(email: email, password: password) { [weak self] error in
             guard let self else { return }
             self.setBusy(false)
             if let error {
@@ -145,7 +156,7 @@ final class LogInViewController: UIViewController {
             showAlert(title: "Field is missing", message: "Email cannot be empty")
             return
         }
-        AuthService.sendPasswordReset(email: email) { [weak self] error in
+        container.auth.sendPasswordReset(email: email) { [weak self] error in
             guard let self else { return }
             if error != nil {
                 self.showAlert(title: "Error", message: "Cannot send reset link. Please try again.")
@@ -159,6 +170,6 @@ final class LogInViewController: UIViewController {
     }
 
     @objc private func createAccountTapped() {
-        navigationController?.pushViewController(CreateAccountViewController(), animated: true)
+        navigationController?.pushViewController(CreateAccountViewController(container: container), animated: true)
     }
 }
