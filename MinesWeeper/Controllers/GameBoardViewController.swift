@@ -39,7 +39,6 @@ final class GameBoardViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = Theme.surface1
-        navigationController?.setNavigationBarHidden(true, animated: false)
         setUpHeader()
         setUpBoard()
         loadUserPhoto()
@@ -70,6 +69,7 @@ final class GameBoardViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
         if isTimerRunning { startTicker() }
     }
 
@@ -89,6 +89,9 @@ final class GameBoardViewController: UIViewController {
         userButton.menu = UIMenu(children: [
             UIAction(title: "Number of Mines", image: UIImage(systemName: "gearshape")) { [weak self] _ in
                 self?.showEditNumberOfMines()
+            },
+            UIAction(title: "Records", image: UIImage(systemName: "trophy")) { [weak self] _ in
+                self?.navigationController?.pushViewController(RecordsViewController(), animated: true)
             },
             UIAction(title: "Log Out", image: UIImage(systemName: "rectangle.portrait.and.arrow.right"),
                      attributes: .destructive) { [weak self] _ in
