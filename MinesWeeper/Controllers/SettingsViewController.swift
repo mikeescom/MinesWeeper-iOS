@@ -19,6 +19,8 @@ final class SettingsViewController: UIViewController {
     private let minesHelpLabel = UILabel()
     private let saveButton = Theme.button(title: "Save and return")
     private let logOutButton = Theme.button(title: "Log Out")
+    private let deleteAccountButton = Theme.button(title: "Delete account", filled: false)
+    private let spinner = UIActivityIndicatorView(style: .large)
 
     /// [maxMines] is the most the current board allows. [onNumberOfMinesChanged] runs after a
     /// new count is saved; [onLogOut] runs when the player taps Log Out.
@@ -49,6 +51,8 @@ final class SettingsViewController: UIViewController {
 
         saveButton.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
         logOutButton.addTarget(self, action: #selector(logOutTapped), for: .touchUpInside)
+        deleteAccountButton.configuration?.baseForegroundColor = UIColor(hex: 0xF85454)
+        deleteAccountButton.addTarget(self, action: #selector(deleteAccountTapped), for: .touchUpInside)
 
         let accountLabel = Self.label("Account", size: 18, weight: .bold, color: Theme.primaryText)
         let signedInLabel = Self.label(container.auth.currentUserEmail.map { "Signed in as \($0)" } ?? "",
@@ -60,7 +64,7 @@ final class SettingsViewController: UIViewController {
         let stack = UIStackView(arrangedSubviews: [
             Self.label("Number of mines", size: 16, weight: .semibold, color: Theme.primaryText),
             minesField, minesHelpLabel, saveButton,
-            accountLabel, signedInLabel, logOutButton,
+            accountLabel, signedInLabel, logOutButton, deleteAccountButton,
             versionLabel,
         ])
         stack.axis = .vertical
@@ -68,7 +72,7 @@ final class SettingsViewController: UIViewController {
         stack.setCustomSpacing(16, after: minesHelpLabel)
         stack.setCustomSpacing(40, after: saveButton)
         stack.setCustomSpacing(16, after: signedInLabel)
-        stack.setCustomSpacing(40, after: logOutButton)
+        stack.setCustomSpacing(40, after: deleteAccountButton)
         stack.translatesAutoresizingMaskIntoConstraints = false
 
         let scrollView = UIScrollView()
@@ -77,7 +81,14 @@ final class SettingsViewController: UIViewController {
         scrollView.addSubview(stack)
         view.addSubview(scrollView)
 
+        spinner.color = Theme.primaryText
+        spinner.hidesWhenStopped = true
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(spinner)
+
         NSLayoutConstraint.activate([
+            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -114,6 +125,45 @@ final class SettingsViewController: UIViewController {
 
     @objc private func logOutTapped() {
         onLogOut()
+    }
+
+    /// Confirms, then deletes the account and everything stored for it.
+    @objc private func deleteAccountTapped() {
+        let isEmailAccount = container.auth.currentSignInMethod == .email
+        let message = "This permanently deletes your account and all your records. It can't be undone."
+            + (isEmailAccount ? "\n\nEnter your password to confirm."
+                              : "\n\nYou'll be asked to sign in again to confirm.")
+        let alert = UIAlertController(title: "Delete account?", message: message, preferredStyle: .alert)
+        if isEmailAccount {
+            alert.addTextField { field in
+                field.isSecureTextEntry = true
+                field.placeholder = "Password"
+                field.textContentType = .password
+            }
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self, weak alert] _ in
+            self?.deleteAccount(password: alert?.textFields?.first?.text)
+        })
+        present(alert, animated: true)
+    }
+
+    private func deleteAccount(password: String?) {
+        spinner.startAnimating()
+        view.isUserInteractionEnabled = false
+        container.deleteAccount(presenting: self, password: password) { [weak self] error in
+            guard let self else { return }
+            self.spinner.stopAnimating()
+            self.view.isUserInteractionEnabled = true
+            if error is CancellationError {
+                return
+            } else if let error {
+                print("SettingsViewController: deleting account failed: \(error)")
+                self.showAlert(title: "Couldn't delete account", message: error.localizedDescription)
+            } else {
+                self.onLogOut()
+            }
+        }
     }
 
     private static func label(_ text: String, size: CGFloat, weight: UIFont.Weight = .regular,
