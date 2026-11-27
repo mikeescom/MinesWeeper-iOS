@@ -13,6 +13,8 @@ protocol RecordsStoring: AnyObject {
     /// The records stored on this device, newest first.
     func loadAllRecords() -> [RecordItem]
     func clearLocalRecords()
+    /// Deletes every record stored on the server for [userId].
+    func deleteServerRecords(userId: String, completion: @escaping (Error?) -> Void)
 }
 
 /// Saves finished games to the Realtime Database under the signed-in user's Firebase uid and
@@ -78,6 +80,11 @@ final class RecordsRepository: RecordsStoring {
     /// The records stored on this device, newest first.
     func loadAllRecords() -> [RecordItem] {
         localStore.allRecords()
+    }
+
+    func deleteServerRecords(userId: String, completion: @escaping (Error?) -> Void) {
+        stopSync()
+        usersReference.child(userId).removeValue { error, _ in completion(error) }
     }
 
     /// Stops syncing and forgets the records stored on this device.

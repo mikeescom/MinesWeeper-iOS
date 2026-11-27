@@ -7,12 +7,14 @@
 //
 
 import UIKit
+import AuthenticationServices
 import GoogleSignIn
 
 final class LogInViewController: UIViewController {
 
     private let emailField = Theme.textField(placeholder: "email")
     private let passwordField = Theme.textField(placeholder: "password", secure: true)
+    private let appleButton = ASAuthorizationAppleIDButton(type: .signIn, style: .white)
     private let googleButton = GIDSignInButton()
     private let logInButton = Theme.button(title: "Log In")
     private let resetPasswordButton = Theme.button(title: "Reset password", filled: false)
@@ -47,6 +49,9 @@ final class LogInViewController: UIViewController {
         let googleLabel = Self.label("Log in with:")
         let orLabel = Self.label("OR")
 
+        appleButton.cornerRadius = 8
+        appleButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        appleButton.addTarget(self, action: #selector(appleTapped), for: .touchUpInside)
         googleButton.style = .wide
         googleButton.colorScheme = .dark
         googleButton.addTarget(self, action: #selector(googleTapped), for: .touchUpInside)
@@ -63,7 +68,7 @@ final class LogInViewController: UIViewController {
         emailBox.layer.cornerRadius = 20
 
         let stack = UIStackView(arrangedSubviews: [
-            titleLabel, googleLabel, googleButton, orLabel, emailBox, resetPasswordButton, createAccountButton,
+            titleLabel, googleLabel, appleButton, googleButton, orLabel, emailBox, resetPasswordButton, createAccountButton,
         ])
         stack.axis = .vertical
         stack.spacing = 16
@@ -115,6 +120,19 @@ final class LogInViewController: UIViewController {
 
     private func goToGame() {
         switchRoot(to: GameBoardViewController(container: container))
+    }
+
+    @objc private func appleTapped() {
+        // No spinner: Apple shows its own sheet, and a cancelled sign-in never calls back.
+        container.auth.signInWithApple(presenting: self) { [weak self] error in
+            guard let self else { return }
+            if let error {
+                print("LogInViewController: Apple sign-in failed: \(error)")
+                self.showAlert(title: "Error", message: "Login failed")
+            } else {
+                self.goToGame()
+            }
+        }
     }
 
     @objc private func googleTapped() {

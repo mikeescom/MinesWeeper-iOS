@@ -17,8 +17,9 @@ Both apps play by the same rules and share the same Firebase project and record 
   menu.
 - **Custom difficulty:** set the number of mines (1 to the number of squares minus 1, at most
   999) from the account menu.
-- **Accounts:** Sign in with Google or with email and password, including account creation and
-  password reset.
+- **Accounts:** Sign in with Apple, Sign in with Google, or email and password, including account
+  creation and password reset. Players can delete their account and all their records from
+  Settings.
 - **Records:** every win is saved to Firebase Realtime Database and cached on the device. The
   Records screen ranks them by mines per square, then by time.
 
@@ -67,7 +68,9 @@ that Hilt does in the Android app.
 
 The app shares its Firebase project with the Android app:
 
-- **Authentication:** enable the **Google** and **Email/Password** sign-in providers.
+- **Authentication:** enable the **Apple**, **Google** and **Email/Password** sign-in providers.
+  Sign in with Apple also needs the capability on the App ID in your Apple Developer account
+  (Xcode's automatic signing adds it from `MinesWeeper/MinesWeeper.entitlements`).
 - **Realtime Database:** records are stored at `users/<uid>/<record id>`, with the same fields as
   on Android. The database rules live in the Android repo (`database.rules.json`) and cover both
   apps.
