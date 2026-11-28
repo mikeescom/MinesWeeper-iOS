@@ -98,3 +98,8 @@ The tests cover:
 
 GitHub Actions (`.github/workflows/ios.yml`) builds the app and runs the tests on an available
 iPhone simulator for every push to `main` and every pull request into it.
+
+## Privacy
+
+See the [privacy policy](Privacy_Policy.md) and how to [delete your account](delete_account.md). The
+same pages are published with GitHub Pages for the App Store listing.
